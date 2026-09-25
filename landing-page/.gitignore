@@ -1,0 +1,68 @@
+# Dependencias de Node.js
+/node_modules
+/.pnp
+.pnp.js
+
+# Archivos de logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Directorios de dependencias
+/.yarn-integrity
+
+# Directorios de salida de compilación
+/build
+/dist
+
+# Cobertura de pruebas
+/coverage
+
+# Directorios de caché
+/.cache
+.cache-loader
+
+# Archivo de producción de Webpack
+/webpack.config.js
+
+# Archivos relacionados con TypeScript
+*.tsbuildinfo
+
+# Archivos y configuraciones de entorno
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Archivos de configuración del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos relacionados con el IDE/Editor
+.vscode
+.idea
+*.swp
+
+# Otros archivos y directorios opcionales
+/.expo
+/.expo-shared
+
+# Archivos de dependencias lock (opcional)
+package-lock.json
+yarn.lock
+
+# Archivos de cache de npm
+.npm
+
+# Directorios de output si usas otros frameworks o bundlers
+/.next
+/out
+/.nuxt
+
+# Output generado por Gatsby (si se usa)
+/public
+.cache
+
+# Ignora los archivos de configuración locales de ESLint
+.eslintcache

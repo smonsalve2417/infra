@@ -1,0 +1,56 @@
+# Use the official Golang image as the base image
+FROM golang:1.22.4-alpine AS builder
+
+WORKDIR /app
+
+# Copy the notifications module
+COPY ./notifications ./notifications 
+
+# Copy the go.mod and go.sum files from the notifications module
+COPY ./notifications/go.mod ./notifications/go.sum ./
+
+# Copy the common module
+COPY ./common ./common
+
+# Copy the gateway module
+COPY ./gateway ./gateway
+
+# Copy the user module (assuming there's a user module)
+COPY ./user ./user
+
+# Copy the posts module (assuming there's a posts module)
+COPY ./posts ./posts
+
+COPY ./WebSocket ./WebSocket
+
+COPY ./payments ./payments
+
+# Copy the go.work file
+COPY go.work ./
+
+# Set the working directory to the app
+WORKDIR /app
+
+# Download the Go module dependencies
+RUN go mod tidy
+
+# Build the application
+RUN go build -o /main ./notifications
+
+# Use the official Alpine image as the base image
+FROM alpine:latest
+
+# Set the working directory to /root/
+WORKDIR /root/
+
+# Copy the built application from the builder stage
+COPY --from=builder /main .
+
+# Copy the .env file from the notifications module
+#COPY ./notifications/.env ./notifications/.env
+
+# Expose port 2000
+EXPOSE 2000
+
+# Set the default command to run the application
+CMD ["./main"]

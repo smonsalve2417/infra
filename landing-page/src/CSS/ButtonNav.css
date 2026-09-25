@@ -1,0 +1,36 @@
+.btn{
+    background-color: transparent;
+    border: none;
+    color: #fff;
+    padding: 0px 20px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+.btn:hover{
+    color:#FC5193 ;
+}
+
+
+.btn1{
+    background-color: transparent;
+    border: none;
+    color: #fff;
+    padding: 0px 10px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+.btn1:hover{
+    color:#FC5193 ;
+}
+
+
+
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column; /* Coloca la marca y los botones en columna en pantallas pequeñas */
+  }
+}

@@ -1,0 +1,120 @@
+/* Header */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0),      
+    rgba(32, 32, 36, 1)          
+);
+
+  overflow: hidden;
+}
+
+/* Logo */
+.logo {
+  flex: 0 0 auto;
+  
+}
+
+.logo img {
+  width: 60px;
+  height: auto;
+}
+
+
+.navbar-content {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  justify-content: center;
+  padding-right: 40px;
+  
+}
+
+/* Gema */
+.gema {
+  position: relative;
+  width: 30px;
+  height: 40px;
+  margin: 0 20px;
+}
+
+.gema img {
+  width: 100%;
+  height: auto;
+}
+
+
+.menu {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu-item {
+  margin: 0 10px;
+  cursor: pointer;
+  transition: .2s ease-in;
+  font-size: 1rem;
+  white-space: nowrap;
+  
+
+}
+
+.menu-item:hover {
+  color: #FC5193;
+}
+
+/* Ajustes para dispositivos móviles */
+@media (max-width: 768px) {
+  .logo img {
+    width: 55px;
+  }
+
+  .gema {
+    width: 20px;
+    margin: 0px 10px ;
+  }
+
+  .menu-item  {
+    font-size: 0.9rem;
+    margin: 12px 10px;
+    margin-right: 0px;
+  }
+
+  .navbar-content {
+    padding-right: 45px;
+  }
+
+  .header{
+    padding: 2px 20px;
+  }
+}
+
+
+
+
+@media (min-width: 1024px) {
+  .logo img {
+    width: 150px; /* Aumentar el tamaño del logo */
+  }
+
+  .gema img {
+    width:10%; /* Aumentar el tamaño de la gema */
+  }
+
+  .menu-item button {
+    padding: 12px 10px; /* Incrementar el padding de los botones */
+    font-size: 1rem; /* Aumentar el tamaño de fuente */
+  }
+
+  .menu-item {
+    margin-right: 10px; /* Mayor separación entre los elementos del menú */
+  }
+}
+
+

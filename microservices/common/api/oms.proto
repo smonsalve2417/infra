@@ -1,0 +1,700 @@
+syntax = "proto3";
+
+option go_package = "github.com/Eskiwi-Organization/infra/commons/api";
+
+package api;
+
+import "google/protobuf/timestamp.proto";
+
+
+message PublicUser {
+    string id = 1;            // Use string or bytes for ObjectID
+    string first_name = 2;
+    string last_name = 3;
+    string username = 4;
+    string avatar_uri = 5;
+    string banner_uri = 6;
+    string description = 7;
+    google.protobuf.Timestamp created_at = 8;    // You can use timestamp type for actual use
+    int64 followers = 9;
+    int64 following = 10;
+  }
+
+message Notification {
+  string id=7;
+  PublicUser user = 1;
+  Post post = 2;
+  Comment comment= 3;
+  google.protobuf.Timestamp created_at = 8;       // Use timestamp type if needed
+  string destination_user_id = 4; // Use string or bytes for ObjectID
+  bool is_read = 5;
+  string type = 6;             // "Follow", "Like", "Comment", "Message", "newPost"
+}
+
+message GetLatestNotificationsRequest {
+    string userID = 1;
+    int32 page = 2;
+}
+
+message GetLatestNotificationsResponse {
+    repeated Notification notifications = 1;
+}
+
+message NotificationsSettings {
+    bool pop_Up = 1;
+    bool unread_messages = 2;
+    bool new_Post = 3;
+    bool new_About_Eskiwi = 4;
+    bool new_Sub = 5;
+    bool new_Comment = 6;
+    bool new_Like = 7;
+    string userXid= 8;
+  }
+
+
+
+service NotificationService {
+    rpc GetLatestNotifications(GetLatestNotificationsRequest) returns (GetLatestNotificationsResponse);
+    
+}
+
+//User Service here
+message SendUserCodeResponse {
+    string status = 1;
+}
+
+message SendUserCodeRequest {
+    string Email = 1;
+}
+
+message User {
+    string id = 1; 
+    string first_name = 2;
+    string last_name = 3;
+    string username = 4;
+    string email = 5;
+    string password = 6;
+    string birth_date = 7;
+    string created_at = 8; // Alternatively, use int64 for Unix timestamp
+    string avatar_uri = 9;
+    string banner_uri = 10;
+    string verified = 11;
+    string code = 12;
+    string status= 13;
+    int64 followers = 14;
+    int64 following = 15;
+    string description= 16;
+    repeated string expo_Token= 17;
+    repeated string roles= 19;
+    int32 pending_notifications= 18;
+    int32 pending_messages=20;
+    int32 gems=21;
+}
+//login
+message LoginUserRequest {
+    string email = 1;
+    string password = 2;
+}
+
+message LoginUserResponse {
+    string status = 1;
+    string access_token = 2;
+    string verified = 3;
+}
+//validate
+message ValidateUserRequest {
+    string email = 1;
+    string code = 2;
+}
+
+message ValidateUserResponse {
+    string status = 1;
+}
+//register
+message RegisterUserRequest {
+    string first_name = 1;
+    string last_name = 2;
+    string username = 3;
+    string email = 4;
+    string password = 5;
+    string birth_date = 6;
+}
+
+message RegisterUserResponse {
+    string status = 1;
+}
+//get
+message GetUserRequest {
+    string userID = 1;
+}
+//avatar
+message UpdateAvatarRequest {
+    string avatar = 1;
+    string userID= 2;
+}
+
+message UpdateAvatarResponse {
+    string status = 1;
+}
+//banner
+message UpdateBannerRequest {
+    string banner = 1;
+    string userID= 2;
+}
+
+message UpdateBannerResponse {
+    string status = 1;
+}
+//follow user
+message FollowUserRequest {
+    string targetID = 1;
+    string userID= 2;
+}
+
+message FollowUserResponse {
+    string status = 1;
+}
+
+message GetUserFollowRequest {
+    string targetID = 1;
+    string userID = 2;
+}
+message GetUserFollowResponse {
+    bool following = 1;
+}
+
+message UpdateDescriptionRequest{
+    string userID = 1;
+    string text = 2;
+}
+
+message UpdateDescriptionResponse {
+    string status = 1;
+}
+
+message AddExpoTokenRequest{
+    string userID = 1;
+    string ExpoToken = 2;
+}
+
+message AddExpoTokenResponse {
+    string status = 1;
+}
+
+message GetUserNotificationSettingsRequest {
+    string userID = 1;
+}
+
+message SearchCreatorsRequest{
+    string username = 1;
+}
+
+message SearchCreatorsResponse {
+    repeated PublicUser publicusers = 1;
+}
+
+message UpdateNotificationsSettingsResponse {
+    string status = 1;
+}
+
+message GetTopCreatorRequest{
+    
+}
+
+message GetTopCreatorResponse {
+    repeated PublicUser topCreators = 1;
+}
+
+message ChangePasswordRequest {
+    string email = 1;
+    string code = 2;
+    string password = 3;
+}
+
+message ChangePasswordResponse {
+    string status = 1;
+}
+
+message UpdateUsernameRequest{
+    string userID = 1;
+    string username = 2;
+}
+
+message UpdateUsernameResponse {
+    string status = 1;
+}
+
+message ChatsSettings{
+    string userXid = 1;
+    int32 price = 2;
+    repeated string rules =3;
+}
+
+message CreateChatsSettingsRequest{
+    ChatsSettings chatsettings =1;
+}
+
+message CreateChatsSettingsResponse {
+    string status = 1;
+}
+
+message GetChatSettingsRequest{
+    string user_id =1;
+}
+
+message GetTransactionsRequest {
+    string userId = 1; // UserID to fetch transactions
+    int32 page = 2;
+}
+
+message Transaction {
+    int64 id = 1;               // ID in JSON
+    int32 gemAmount = 2;        // GemAmount in JSON
+    string transactionType = 3; // TransactionType in JSON
+    string type = 4;            // Type in JSON (outgoing/ingoing)
+    PublicUser from = 5;        // From in JSON (the user involved in the transaction)
+    bool pending = 6;           // Pending in JSON
+    google.protobuf.Timestamp createdAt = 7; // CreatedAt in JSON
+  }
+
+  message TransactionsResponse {
+    repeated Transaction transactions = 1; // Transactions in JSON
+  }
+
+  message SubscriptionTiers {
+    string Xid = 1 ;
+    string creatorXid = 2 ;
+    string name = 3 ;
+    repeated string benefits = 4 ;
+    int32 tier = 5 ;
+    int32 price = 6 ;
+  }
+
+  message CreateSubscriptionTierResponse {
+    string status = 1; 
+  }
+
+  message UpdateSubscriptionTierResponse {
+    string status = 1; 
+  }
+
+  message GetSubscriptionTierRequest{
+    string creator_id =1;
+}
+
+message GetSubscriptionTierResponse {
+    repeated SubscriptionTiers tiers = 1;
+}
+
+service UserService {
+    rpc LoginUser(LoginUserRequest) returns(LoginUserResponse);
+    rpc SendUserCode(SendUserCodeRequest) returns (SendUserCodeResponse);
+    rpc ValidateUser(ValidateUserRequest) returns(ValidateUserResponse);
+    rpc RegisterUser(RegisterUserRequest) returns(RegisterUserResponse);
+    rpc ChangePassword(ChangePasswordRequest) returns(ChangePasswordResponse);
+    rpc GetUser(GetUserRequest) returns(User);
+    rpc GetUserByID(GetUserRequest) returns(User);
+    rpc UpdateAvatar(UpdateAvatarRequest) returns(UpdateAvatarResponse);
+    rpc UpdateBanner(UpdateBannerRequest) returns(UpdateBannerResponse);
+    rpc FollowUser(FollowUserRequest) returns(FollowUserResponse);
+    rpc UnFollowUser(FollowUserRequest) returns(FollowUserResponse);
+    rpc GetUserFollow(GetUserFollowRequest) returns(GetUserFollowResponse);
+    rpc UpdateDescription(UpdateDescriptionRequest) returns(UpdateDescriptionResponse);
+    rpc UpdateUsername(UpdateUsernameRequest) returns(UpdateUsernameResponse);
+    rpc AddExpoToken(AddExpoTokenRequest) returns(AddExpoTokenResponse);
+    rpc DeleteExpoToken(AddExpoTokenRequest) returns(AddExpoTokenResponse);
+    rpc UpdateNotificationsSettings(NotificationsSettings) returns (UpdateNotificationsSettingsResponse);
+    rpc GetUserNotificationSettings(GetUserNotificationSettingsRequest) returns (NotificationsSettings);
+    rpc SearchCreators(SearchCreatorsRequest) returns (SearchCreatorsResponse);
+    rpc GetTopCreator(GetTopCreatorRequest) returns (GetTopCreatorResponse);
+    rpc CreateChatsSettings(CreateChatsSettingsRequest) returns (CreateChatsSettingsResponse);
+    rpc GetChatSettings(GetChatSettingsRequest) returns (ChatsSettings);
+    rpc GetTransactions(GetTransactionsRequest) returns (TransactionsResponse);
+    rpc CreateSubscriptionTier(SubscriptionTiers) returns (CreateSubscriptionTierResponse);
+    rpc UpdateSubscriptionTier(SubscriptionTiers) returns (UpdateSubscriptionTierResponse);
+    rpc GetSubscriptionTier(GetSubscriptionTierRequest) returns (GetSubscriptionTierResponse);
+}
+
+//Post service
+message CreatePostPayload {
+    string title = 1;
+    string description = 2;
+    repeated string content = 3;
+    repeated string tags = 4;
+}
+
+message CreatePostRequest {
+    CreatePostPayload post = 1;
+    string userID=2;
+}
+
+message CreatePostResponse {
+    string status = 1;
+}
+
+message DeletePostRequest {
+    string postID = 1;
+    string userID= 2;
+}
+
+message DeletePostResponse {
+    string status = 1;
+}
+
+
+
+//like
+message LikePostRequest {
+    string  userID= 1;
+    string postID=2;
+}
+message LikePostResponse {
+    string status = 1;
+}
+
+
+//GetLatestPosts
+message PostWithUser  {
+    User user = 1;
+    Post post =2;
+
+}
+
+message GetLatestPostsResponse  {
+    repeated PostWithUser posts= 1;
+
+}
+
+message GetPostRequest  {
+    string postID= 1;
+
+}
+
+message GetLatestPostsRequest {
+    int32 page = 1;
+    int32 pageSize = 2;
+}
+
+
+//GetLatestUserPosts
+message GetLatestUserPostsResponse  {
+    repeated PostWithUser posts= 1;
+
+}
+
+message GetLatestUserPostsRequest {
+    string targetID=1;
+    int32 page = 2;
+    int32 pageSize = 3;
+}
+
+//get like
+message GetUserLikeRequest {
+    string  userID= 1;
+    string postID=2;
+}
+message GetUserLikeResponse {
+    bool liked = 1;
+}
+//create comment
+message CreateCommentPayload {
+    string userID = 1;
+    string postID = 2;
+    string text = 3;
+    int32 gems = 4;
+}
+
+message CreateCommentRequest {
+    CreateCommentPayload comment = 1;
+}
+
+message CreateCommentResponse {
+    string status = 1;
+}
+//delete comment
+message DeleteCommentRequest {
+    string  commentID= 1;
+}
+message DeleteCommentResponse {
+    string status = 1;
+}
+
+//like comment
+message LikeCommentRequest {
+    string  userID= 1;
+    string commentID=2;
+}
+message LikeCommentResponse {
+    string status = 1;
+}
+
+
+//get like
+message GetUserCommentLikeRequest {
+    string  userID= 1;
+    string commentID=2;
+}
+message GetUserCommentLikeResponse {
+    bool liked = 1;
+}
+
+//GetLatestComments
+message CommentWithUser  {
+    User user = 1;
+    Comment comment =2;
+
+}
+
+message GetLatestCommentsResponse  {
+    repeated CommentWithUser comments= 1;
+
+}
+
+message GetLatestCommentsRequest {
+    string postID=1;
+    int32 page = 2;
+    int32 pageSize = 3;
+    string userID=4;
+}
+//create reply
+message CreateReplyPayload {
+    string userID = 1;
+    string commentID = 2;
+    string text = 3;
+}
+
+message CreateReplyRequest {
+    CreateReplyPayload reply = 1;
+}
+
+message CreateReplyResponse {
+    string status = 1;
+}
+//Get Latest replies
+message ReplyWithUser  {
+    User user = 1;
+    Reply reply =2;
+
+}
+
+message GetLatestRepliesResponse  {
+    repeated ReplyWithUser replies= 1;
+
+}
+
+message GetLatestRepliesRequest {
+    string CommentID=1;
+    int32 page = 2;
+    int32 pageSize = 3;
+}
+//delete reply
+message DeleteReplyRequest {
+    string  replyID= 1;
+    string commentID=2;
+}
+message DeleteReplyResponse {
+    string status = 1;
+}
+
+
+
+
+
+message Post {
+    string id = 1; // ID is the unique identifier for the post.
+    string title = 2; // Title is the title of the post.
+    string description = 3; // Description is a brief summary of the post.
+    string userXid = 4; // User_id is the ID of the user who created the post.
+    repeated string content = 5; // Content is the main body of the post.
+    repeated string tags = 6; // Tags are keywords associated with the post.
+    int32 gems = 7; // Gems is the number of gems the post has received.
+    int32 likes = 8; // Likes is the number of likes the post has received.
+    int32 comments = 13;
+    int32 shares = 9; // Shares is the number of times the post has been shared.
+    int32 saves = 10; // Saves is the number of times the post has been saved.
+    google.protobuf.Timestamp created_At = 11; // CreatedAt is the timestamp when the post was created.
+    google.protobuf.Timestamp updated_At = 12; // UpdatedAt is the timestamp when the post was last updated.
+  }
+
+  message Comment{
+    string id = 1; 
+    string userXid = 2; 
+    string postXid = 3; 
+    string text = 4; 
+    int32 gems=9;
+    int32 likes = 5; 
+    int32 replies = 6;
+    google.protobuf.Timestamp created_At = 7; 
+    google.protobuf.Timestamp updated_At = 8; 
+  }
+
+  message Reply{
+    string id = 1; 
+    string userXid = 2; 
+    string commentXid = 3; 
+    string text = 4; 
+    int32 likes = 5; 
+    int32 replies = 6;
+    google.protobuf.Timestamp created_At = 7; 
+    google.protobuf.Timestamp updated_At = 8; 
+  }
+
+
+service PostService {
+    rpc CreatePost(CreatePostRequest) returns (CreatePostResponse);
+    rpc DeletePost(DeletePostRequest) returns (DeletePostResponse);
+    rpc LikePost(LikePostRequest) returns (LikePostResponse);
+    rpc UnlikePost(LikePostRequest) returns (LikePostResponse);
+    rpc GetPost(GetPostRequest) returns (GetLatestPostsResponse);
+    rpc GetLatestPosts(GetLatestPostsRequest) returns (GetLatestPostsResponse);
+    rpc GetLatestUserPosts(GetLatestUserPostsRequest) returns (GetLatestUserPostsResponse);
+    rpc GetUserLike(GetUserLikeRequest) returns (GetUserLikeResponse);
+    rpc GetUserCommentLike(GetUserCommentLikeRequest) returns (GetUserCommentLikeResponse);
+    rpc CreateComment(CreateCommentRequest) returns (CreateCommentResponse);
+    rpc DeleteComment(DeleteCommentRequest) returns (DeleteCommentResponse);
+    rpc LikeComment(LikeCommentRequest) returns (LikeCommentResponse);
+    rpc UnLikeComment(LikeCommentRequest) returns (LikeCommentResponse);
+    rpc GetLatestComments(GetLatestCommentsRequest) returns (GetLatestCommentsResponse);
+    rpc CreateReply(CreateReplyRequest) returns (CreateReplyResponse);
+    rpc DeleteReply(DeleteReplyRequest) returns (DeleteReplyResponse);
+    rpc GetLatestReplies(GetLatestRepliesRequest) returns (GetLatestRepliesResponse);
+    
+}
+
+message CreateChatRequest {
+    string userID=1;
+    string creatorID = 2;  
+}
+
+message CreateChatResponse {
+    repeated ChatWithUser chats= 1;  
+}
+
+
+message CreateRoomRequest {
+    string id=1;
+    string userID = 2;  
+    bool request = 3; 
+
+}
+
+message CreateRoomResponse {
+    bool created=1;  
+}
+
+
+
+
+message GetLatestsChatsRequest {
+    int32 page=1;
+    string userID = 2;  
+
+}
+
+message ChatWithUser  {
+    User user = 1;
+    Chat chat =2;
+    int32 unread= 3;
+
+}
+
+message GetLatestsChatsResponse {
+    repeated ChatWithUser chats= 1;  
+}
+
+
+
+message GetChatRequest {
+    string chatID = 1;  
+    string userID = 2; 
+
+}
+
+
+message GetChatResponse {
+    repeated ChatWithUser chats= 1;  
+}
+
+
+
+
+
+
+
+message GetLatestsMessagesRequest {
+    int32 page=1;
+    string userID = 2;  
+    string chatID = 3;
+
+}
+
+
+message GetLatestsMessagesResponse {
+    repeated Message messages= 1;  
+}
+
+
+message AcceptChatReqRequest {
+    string  chatID= 1;
+}
+message AcceptChatReqResponse {
+    string status = 1;
+}
+
+message Chat {
+    
+    string id = 1; 
+    string creatorXid = 2; 
+    string userXid = 3; 
+    google.protobuf.Timestamp createdAt = 4;
+    bool request = 5;
+    string lastMessage = 7;
+    google.protobuf.Timestamp lastSentAt = 8;
+  }
+
+  message Message {
+    string text = 1;
+    string roomId = 2;
+    string clientXid = 3;
+    int32 gems = 4;
+    google.protobuf.Timestamp createdAt = 5;
+    bool read = 6;
+    repeated string contents= 7;
+  }
+
+service WebService {
+    rpc CreateChat(CreateChatRequest) returns(CreateChatResponse);
+    rpc CreateRoom(CreateRoomRequest) returns (CreateRoomResponse);
+    rpc GetLatestsChats(GetLatestsChatsRequest) returns(GetLatestsChatsResponse);
+    rpc GetLatestsRequestChats(GetLatestsChatsRequest) returns(GetLatestsChatsResponse);
+    rpc GetChat(GetChatRequest) returns(GetChatResponse);
+    rpc GetLatestsMessages(GetLatestsMessagesRequest) returns(GetLatestsMessagesResponse);
+    rpc AcceptChatReq(AcceptChatReqRequest) returns (AcceptChatReqResponse);
+    rpc RejectChatReq(AcceptChatReqRequest) returns (AcceptChatReqResponse);
+    
+}
+
+message GetAvailableSubscriptionGroupRequest {
+    string  UserID= 1;
+}
+message GetAvailableSubscriptionGroupResponse {
+    string group = 1;
+}
+
+message CreateSubscribeToCreatorRequest {
+    string  UserID= 1;
+    string CreatorID=2;
+    int32 tier=3;
+    string ProductID=4;
+}
+
+message CreateSubscribeToCreatorResponse {
+    string status = 1;
+}
+
+
+service PaymentsService {
+    rpc GetAvailableSubscriptionGroup(GetAvailableSubscriptionGroupRequest) returns (GetAvailableSubscriptionGroupResponse);
+    rpc CreateSubscribeToCreator(CreateSubscribeToCreatorRequest) returns (CreateSubscribeToCreatorResponse);
+    
+}

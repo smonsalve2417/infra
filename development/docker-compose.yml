@@ -1,0 +1,255 @@
+version: "3.8"
+
+services:
+  rabbitmq:
+    container_name: rabbitmq
+    image: "rabbitmq:3-management"
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmqctl status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: on-failure
+    networks:
+      - backend-network
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    networks:
+      - backend-network
+
+  mysql:
+    image: mysql:latest
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: testdb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: userpassword
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - backend-network
+
+  es_gateway:
+    build:
+      context: ../
+      dockerfile: Dockerfile_Gateway
+    container_name: es_gateway
+    ports:
+      - "90:90"
+    environment:
+      HTTP_ADDR: :90
+      MONGO_ADDR: mongodb://root:example@mongodb:27017/
+      MONGO_DATABASE_NAME: Eskiwi
+      NOTIFICATION_SERVICE_ADDR: notifications:2000
+      POST_SERVICE_ADDR: posts:3000
+      USER_SERVICE_ADDR: user:4000
+      PAYMENTS_SERVICE_ADDR: payments:5010
+      WEB_SERVICE_ADDR: websocket:8090
+    depends_on:
+      - mongodb
+      - mysql
+    networks:
+      - backend-network
+
+  es_websocket:
+    build:
+      context: ../
+      dockerfile: Dockerfile_WebSocket
+    container_name: websocket
+    ports:
+      - "8080:8080"
+      - "8090:8090"
+    environment:
+      HTTP_ADDR: :8080
+      GRPC_ADDR: :8090
+      MONGO_ADDR: mongodb://root:example@mongodb:27017/
+      MONGO_DATABASE_NAME: Eskiwi
+      CLOUDFLARE_LINK: da2mmmrwmvcrh.cloudfront.net
+      AWS_CHATS_BUCKET_URL: post.eskiwi.com
+      S3ACCESS: AKIA3OUC7SBANLDZPGP3
+      S3SECRET: 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
+      S3REGION: eu-west-3
+      RABBITMQ_USER: guest
+      RABBITMQ_PASS: guest
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+      mysql:
+        condition: service_started
+    networks:
+      - backend-network
+
+  es_notifications:
+    build:
+      context: ../
+      dockerfile: Dockerfile_Notifications
+    container_name: notifications
+    ports:
+      - "2000:2000"
+    environment:
+      GRPC_ADDR: notifications:2000
+      MONGO_ADDR: mongodb://root:example@mongodb:27017/
+      MONGO_DATABASE_NAME: Eskiwi
+      SESUSER: AKIA3OUC7SBAEKYPEV7E
+      SESPASSWORD: BKqTvNhdTpqQ/yTW37Bitb+8W1a+CmTIdkjaH8V/B+pS
+      SESPORT: 465
+      RABBITMQ_USER: guest
+      RABBITMQ_PASS: guest
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+      mysql:
+        condition: service_started
+    networks:
+      - backend-network
+
+  es_posts:
+    build:
+      context: ../
+      dockerfile: Dockerfile_Posts
+    container_name: posts
+    ports:
+      - "3000:3010"
+    environment:
+      HTTP_ADDR: :3010
+      GRPC_ADDR: posts:3000
+      MONGO_ADDR: mongodb://root:example@mongodb:27017/
+      MONGO_DATABASE_NAME: Eskiwi
+      AWS_POST_BUCKET_URL: post.eskiwi.com
+      S3ACCESS: AKIA3OUC7SBANLDZPGP3
+      S3SECRET: UCYyriPIkr66iDJw9FXGmUliFZ1V1K+NLWSq/M/g
+      S3REGION: eu-west-3
+      CLOUDFLARE_LINK: da2mmmrwmvcrh.cloudfront.net
+      RABBITMQ_USER: guest
+      RABBITMQ_PASS: guest
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+      mysql:
+        condition: service_started
+    networks:
+      - backend-network
+
+  es_user:
+    build:
+      context: ../
+      dockerfile: Dockerfile_User
+    container_name: user
+    ports:
+      - "4000:4010"
+    environment:
+      GRPC_ADDR: user:4000
+      NOTIFICATION_SERVICE_ADDR: notifications:2000
+      MONGO_ADDR: mongodb://root:example@mongodb:27017/
+      MONGO_DATABASE_NAME: Eskiwi
+      AWS_AVATAR_BUCKET_URL: avatars.eskiwi.com
+      JWTSECRET: tragatela
+      S3ACCESS: AKIA3OUC7SBANLDZPGP3
+      S3SECRET: UCYyriPIkr66iDJw9FXGmUliFZ1V1K+NLWSq/M/g
+      S3REGION: eu-west-3
+      CLOUDFLARE_LINK: d28b1xvie0871u.cloudfront.net
+      RABBITMQ_USER: guest
+      RABBITMQ_PASS: guest
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      MYSQL_USER: user
+      MYSQL_PASSWORD: userpassword
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: testdb
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+      mysql:
+        condition: service_started
+    networks:
+      - backend-network
+
+  es_payments:
+    build:
+      context: ../
+      dockerfile: Dockerfile_Payments
+    container_name: payments
+    ports:
+      - "5000:5000"
+      - "5010:5010"
+    environment:
+      HTTP_ADDR: :5000
+      GRPC_ADDR: payments:5010
+      HEADER_AUTH: d41d8cd98f00b204e9800998ecf8427e
+      MONGO_ADDR: mongodb://root:example@mongodb:27017/
+      MONGO_DATABASE_NAME: Eskiwi
+      RABBITMQ_USER: guest
+      RABBITMQ_PASS: guest
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      MYSQL_USER: user
+      MYSQL_PASSWORD: userpassword
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: testdb
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+      mysql:
+        condition: service_started
+    networks:
+      - backend-network
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+      mysql:
+        condition: service_started
+      es_payments:
+        condition: service_started 
+      es_gateway:
+        condition: service_started 
+        
+    networks:
+      - backend-network
+
+networks:
+  backend-network:
+    driver: "bridge"
